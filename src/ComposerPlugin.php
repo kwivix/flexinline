@@ -18,6 +18,7 @@ use Composer\DependencyResolver\Operation\OperationInterface;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Factory;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
@@ -26,6 +27,7 @@ use Composer\Plugin\PluginInterface;
 use Symfony\Flex\Configurator;
 use Symfony\Flex\Options;
 use Symfony\Flex\Recipe;
+use Symfony\Flex\Lock;
 
 class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 {
@@ -143,10 +145,11 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             return;
         }
 
+        $lock = new Lock(getenv('SYMFONY_LOCKFILE') ?: str_replace('composer.json', 'symfony.lock', Factory::getComposerFile()));
         if ($operation instanceof UninstallOperation === true) {
-            $this->configurator->unconfigure($recipe);
+            $this->configurator->unconfigure($recipe, $lock);
         } else {
-            $this->configurator->install($recipe);
+            $this->configurator->install($recipe, $lock);
         }
     }
 }
