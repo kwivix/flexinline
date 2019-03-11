@@ -146,6 +146,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         $lock = new Lock(getenv('SYMFONY_LOCKFILE') ?: str_replace('composer.json', 'symfony.lock', Factory::getComposerFile()));
+
         if ($operation instanceof UninstallOperation === true) {
             $this->configurator->unconfigure($recipe, $lock);
         } else {
